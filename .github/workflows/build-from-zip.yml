@@ -1,10 +1,11 @@
 
-name: Build XO from ZIP
+name: Build XO Android APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -24,8 +25,7 @@ jobs:
           mkdir extracted
           unzip -q XO.zip -d extracted
           test -f extracted/XO/gradlew
-          cd extracted/XO
-          chmod +x gradlew
+          chmod +x extracted/XO/gradlew
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -34,11 +34,15 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
-      - name: Install Android SDK
+      - name: Install Android SDK components
         run: |
-          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Run unit tests
         working-directory: extracted/XO
